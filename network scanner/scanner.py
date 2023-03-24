@@ -1,23 +1,24 @@
-from scapy.all import ARP, Ether, srp
+import scapy.all as scapy
 
-target_ip = "192.168.1.73"
+# Create a list of IP addresses to scan
+ip_list = ['192.168.1.73']
 
-# create ARP packet
-arp = ARP(pdst=target_ip)
-
-# create the ether broadcast packet
-ether = Ether(dst="ff:ff:ff:ff:ff:ff")
-
-packet = ether/arp
-result = srp(packet, timeout=3)[0]
-clients = []
-
-for sent, received in result:
-    # for each response, append IP & MAC address
-    clients.append({'ip': received.psrc, 'mac': received.hwsrc})
-
-# print clients
-print("Available devices in the network:")
-print("IP" + " "*18+"MAC")
-for client in clients:
-    print("{:16}    {}".format(client['ip'], client['mac']))
+# Iterate over each IP address in the list
+for ip in ip_list:
+    # Create an ARP request for the current IP address
+    request = scapy.ARP() 
+    request.pdst = ip + '/24'
+    
+    # Create a broadcast Ethernet frame
+    broadcast = scapy.Ether() 
+    broadcast.dst = 'ff:ff:ff:ff:ff:ff'
+    
+    # Combine the ARP request and broadcast Ethernet frame
+    request_broadcast = broadcast / request 
+    
+    # Send the packet and capture the response
+    clients = scapy.srp(request_broadcast, timeout = 10,verbose = 1)[0] 
+    
+    # Print the IP and MAC addresses of each client that responded
+    for element in clients: 
+        print(element[1].psrc + "      " + element[1].hwsrc)
