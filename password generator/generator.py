@@ -11,7 +11,7 @@ if not isfile('words.txt'):
         # use binary mode to write contents of URL response to file
         f.write(urlopen(url).read())
 
-# load words from words.txt into list
+# load words from words.txt into list of strings
 words = open('words.txt', 'r').read().split('\n')
 
 # define list of special characters
@@ -35,7 +35,7 @@ def create_password(num_words=2, num_numbers=4, num_special=1):
 def main():
     pass_str = create_password()
     result = test(pass_str)
-    strength = result[0]
+    strength = result[0] # return first element from test tuple
 
     print('\n Password: %s'%pass_str)
     print('Strength: %0.5f'%strength)
